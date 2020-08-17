@@ -101,7 +101,8 @@ geno <- data.frame(id = combined@id,
 
 
 pheno <- data.frame(id = combined@id,
-                    trait = combined@pheno[1],
+                    trait = combined@pheno[, 1],
+                    sex = combined@gender,
                     stringsAsFactors = FALSE)
 
 
