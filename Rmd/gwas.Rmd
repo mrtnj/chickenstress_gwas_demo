@@ -1,0 +1,88 @@
+
+# Basic graphs of genome-wide association results
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(qqman)
+```
+
+
+# Load results
+
+Read in the output file from GEMMA.
+
+```{r}
+results <- read_tsv("gwas/output/f2.assoc.txt")
+```
+
+
+# Manhattan plot
+
+We use functions from the qqman package to make the typical Manhattan and qq-plots.
+
+```{r}
+manhattan(results, chr = "chr", p = "p_wald", snp = "rs", bp = "ps")
+      
+```
+
+Significant markers:
+
+```{r}
+as.data.frame(filter(results, p_wald < 5e-8))
+```
+
+
+
+
+## Quantile-quantile plot
+
+```{r}
+qq(results$p_wald)
+```
+
+## Plot of genotypes at a significant marker
+
+We pull out the data underlying the two significant hits and plot them.
+
+```{r}
+geno <- read_tsv("data/txt/geno.txt")
+pheno <- read_tsv("data/txt/pheno.txt")
+
+geno_pheno <- inner_join(geno,
+                         pheno)
+
+qplot(x = factor(SNP_7198),
+      y = trait,
+      data = geno_pheno,
+      geom = "boxplot") +
+    facet_wrap(~ sex)
+```
+
+
+```{r}
+qplot(x = factor(SNP_14704),
+      y = trait,
+      data = geno_pheno,
+      geom = "boxplot") +
+    facet_wrap(~ sex)
+```
+
+Example of a somewhat prettier plot (with hypothetical alleles on the x-axis):
+
+```{r}
+ggplot(aes(x = factor(SNP_14704),
+           y = trait),
+       data = filter(geno_pheno, sex == "F")) +
+    geom_boxplot() +
+    geom_jitter(colour = "grey") +    
+    scale_x_discrete(breaks = 0:2,
+                     labels = c("CC", "CA", "AA")) +
+    xlab("Genotype") +
+    ylab("Trait value") +
+    theme_bw() +
+    theme(panel.grid = element_blank())
+```
+
+
