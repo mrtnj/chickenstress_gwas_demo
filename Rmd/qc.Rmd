@@ -1,0 +1,67 @@
+
+# (Minimal) inspection of the simulated data
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+```
+
+
+## Load data
+
+```{r}
+geno <- read_tsv("data/txt/geno.txt")
+pheno <- read_tsv("data/txt/pheno.txt")
+ped <- read_tsv("data/txt/ped.txt")
+```
+
+
+## Principal components of genotypes
+
+```{r}
+pca <- prcomp(geno[, -1])
+
+pca_data <- cbind(ped, pca$x)
+
+qplot(x = PC1, y = PC2, data = pca_data)
+```
+
+### F1 families
+
+```{r}
+qplot(x = PC1, y = PC2, colour = paste(father, mother), data = filter(pca_data, population == "F1")) + 
+    theme(legend.position = "none")
+```
+
+### F2 families
+
+```{r}
+qplot(x = PC1, y = PC2, colour = paste(father, mother), data = filter(pca_data, population == "F2")) + 
+    theme(legend.position = "none")
+```
+
+## Trait distribution
+
+```{r}
+qplot(x = trait, data = pheno)
+```
+
+Is there a sex difference? Yes. Then we should probably include that as covariates in the GWAS.
+
+```{r}
+qplot(x = trait, fill = sex, data = pheno)
+```
+
+
+
+### Trait values in F2 families
+
+```{r}
+ped_pheno <- inner_join(ped, pheno)
+qplot(x = paste(father, mother), y = trait,
+      data = filter(ped_pheno, population == "F2"),
+      geom = "boxplot") +
+    theme(axis.text.x = element_blank())
+```
+
