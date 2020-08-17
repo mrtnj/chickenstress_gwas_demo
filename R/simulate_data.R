@@ -37,7 +37,7 @@ f1 <- c(randCross2(males = founders[1:10],
 
 f2 <- randCross2(males = f1,
                  females = f1,
-                 nCrosses = 50,
+                 nCrosses = 100,
                  nProgeny = 10,
                  simParam = simparam)
 
@@ -122,3 +122,6 @@ write.table(pheno,
             sep = "\t",
             row.names = FALSE,
             quote = FALSE)
+
+
+
